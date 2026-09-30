@@ -1,0 +1,32 @@
+# Configuración de Netlify: frontend (Vite) + API Express como función
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["express", "mysql2", "multer", "cors"]
+  included_files = ["server/**"]
+
+# La API: todo lo que empiece con /api va a la función
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# Imágenes subidas (se guardan temporalmente en la función)
+[[redirects]]
+  from = "/uploads/*"
+  to = "/.netlify/functions/api/uploads/:splat"
+  status = 200
+  force = true
+
+# Cualquier otra ruta (por ejemplo al refrescar en /productos) carga la app,
+# que al no tener sesión manda al login
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
